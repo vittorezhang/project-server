@@ -26,5 +26,10 @@ module.exports = appInfo => {
   return {
     ...config,
     ...userConfig,
+		security: {
+      csrf: {
+        enable: false,
+      },
+    }
   };
 };
