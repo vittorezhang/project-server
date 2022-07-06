@@ -10,6 +10,9 @@ module.exports = app => {
   router.get('/captcha', controller.utils.captcha);
 
   router.group({ name: 'user', prefix: '/user' }, router => {
+    const {
+      info, register, login, verify,
+    } = controller.user;
     router.post('/register', register);
     router.post('/login', login);
     router.get('/info', info);
