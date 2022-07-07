@@ -1,4 +1,5 @@
 const md5 = require('md5')
+const jwt = require('jsonwebtoken')
 const BaseController = require('./base')
 
 const HashSalt = ':Kaikeba@good!@123'
@@ -11,7 +12,28 @@ const createRule = {
 class UserController extends BaseController {
 
   async login() {
-   this.success('token') 
+  //  this.success('token') 
+		const { ctx, app } = this
+    const { email, captcha, passwd } = ctx.request.body
+    if (captcha.toUpperCase() !== ctx.session.captcha.toUpperCase()) {
+      return this.error('验证码错误')
+    }
+
+    const user = await ctx.model.User.findOne({
+      email,
+      passwd: md5(passwd + HashSalt),
+    })
+    if (!user) {
+      return this.error('用户名密码错误')
+    }
+    // 用户的信息加密成token 返回
+    const token = jwt.sign({
+      _id: user._id,
+      email,
+    }, app.config.jwt.secret, {
+      expiresIn: '100h',
+    })
+    this.success({ token, email, nickname: user.nickname })
   }
   async register() {
     const { ctx } = this;
