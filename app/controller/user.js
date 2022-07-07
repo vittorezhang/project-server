@@ -11,7 +11,7 @@ const createRule = {
 class UserController extends BaseController {
 
   async login() {
-    
+   this.success('token') 
   }
   async register() {
     const { ctx } = this;
