@@ -75,6 +75,16 @@ class UserController extends BaseController {
   async detail() {
     
   }
+  async updateInfo() {
+    const { ctx } = this
+    const url = ctx.request.body.url
+
+    await ctx.model.User.updateOne(
+      { _id: ctx.state.userid },
+      { avatar: url }
+    )
+    this.success()
+  }
   async info() {
     const { ctx } = this
     const { email } = ctx.state
