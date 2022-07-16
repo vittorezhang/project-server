@@ -18,5 +18,6 @@ module.exports = app => {
     router.get('/info', info);
     router.put('/info', updateInfo)
     router.get('/verify', verify);
+		router.get('/detail', info)
   });
 };
