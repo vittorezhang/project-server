@@ -73,7 +73,10 @@ class UserController extends BaseController {
     // 校验用户是否存在
   }
   async detail() {
-    
+    // 只有token怎么获取详情
+    const { ctx } = this
+    const user = await this.checkEmail(ctx.state.email)
+    this.success(user)
   }
   async info() {
     
