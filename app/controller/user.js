@@ -94,6 +94,16 @@ class UserController extends BaseController {
     const user = await this.checkEmail(email)
     this.success(user)
   }
+	async follow() {
+    const { ctx } = this
+    const me = await ctx.model.User.findById(ctx.state.userid)
+    const isFollow = !!me.following.find(id => id.toString() === ctx.params.id)
+    if (!isFollow) {
+      me.following.push(ctx.params.id)
+      me.save()
+      this.message('关注成功')
+    }
+  }
 }
 
 module.exports = UserController
