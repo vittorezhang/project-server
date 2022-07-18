@@ -111,6 +111,17 @@ class UserController extends BaseController {
       this.message('关注成功')
     }
   }
+	async cancelFollow() {
+    const { ctx } = this
+    const me = await ctx.model.User.findById(ctx.state.userid)
+    // 把用户从我的following数组中删掉
+    const index = me.following.map(id => id.toString()).indexOf(ctx.params.id)
+    if (index > -1) {
+      me.following.splice(index, 1)
+      me.save()
+      this.message('取消成功')
+    }
+  }
 }
 
 module.exports = UserController
