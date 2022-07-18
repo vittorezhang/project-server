@@ -94,6 +94,13 @@ class UserController extends BaseController {
     const user = await this.checkEmail(email)
     this.success(user)
   }
+  async isfollow() {
+    const { ctx } = this
+    const me = await ctx.model.User.findById(ctx.state.userid)
+    // 我的follow字段李，有没有传来的这个用户id
+    const isFollow = !!me.following.find(id => id.toString() === ctx.params.id)
+    this.success({ isFollow })
+  }
 	async follow() {
     const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
