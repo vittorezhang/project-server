@@ -111,6 +111,11 @@ class UserController extends BaseController {
       this.message('关注成功')
     }
   }
+  async followers() {
+    const { ctx } = this
+    const users = await ctx.model.User.find({ following: ctx.params.id })
+    this.success(users)
+  }
 	async cancelFollow() {
     const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
