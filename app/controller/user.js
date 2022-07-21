@@ -127,6 +127,11 @@ class UserController extends BaseController {
       this.message('取消成功')
     }
   }
+  async following() {
+    const { ctx } = this
+    const users = await ctx.model.User.findById(ctx.params.id).populate('following')
+    this.success(users.following)
+  }
 }
 
 module.exports = UserController
