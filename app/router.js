@@ -11,7 +11,7 @@ module.exports = app => {
 
   router.group({ name: 'user', prefix: '/user' }, router => {
     const {
-      info, register, login, verify, updateInfo, follow, followers, isfollow, cancelFollow, following, likeArticle
+      info, register, login, verify, updateInfo, follow, followers, isfollow, cancelFollow, following, likeArticle, cancelLikeArticle
     } = controller.user;
     router.post('/register', register);
     router.post('/login', login);
@@ -25,5 +25,6 @@ module.exports = app => {
 		router.delete('/follow/:id', cancelFollow);
 		router.put('/likeArticle/:id', likeArticle);
     router.get('/:id/following', following);
+    router.delete('/likeArticle/:id', cancelLikeArticle);
   });
 };
