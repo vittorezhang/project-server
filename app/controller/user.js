@@ -127,7 +127,8 @@ class UserController extends BaseController {
       this.message('取消成功')
     }
   }
-	async likeArticle() {}
+  async likeArticle () {}
+  async cancelLikeArticle() {}
     
   async following() {
     const { ctx } = this
