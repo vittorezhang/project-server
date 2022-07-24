@@ -129,7 +129,7 @@ class UserController extends BaseController {
   }
   async likeArticle () {}
   async cancelLikeArticle() {}
-    
+  async articleStatus() {}
   async following() {
     const { ctx } = this
     const users = await ctx.model.User.findById(ctx.params.id).populate('following')
