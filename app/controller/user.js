@@ -127,7 +127,16 @@ class UserController extends BaseController {
       this.message('取消成功')
     }
   }
-  async likeArticle () {}
+  async likeArticle () {
+		const { ctx } = this
+    const me = await ctx.model.User.findById(ctx.state.userid)
+    if (!me.likeArticle.find(id => id.toString() === ctx.params.id)) {
+      me.likeArticle.push(ctx.params.id)
+      me.save()
+      await ctx.model.Article.findByIdAndUpdate(ctx.params.id, { $inc: { like: 1 } })
+      return this.message('点赞成功')
+    }
+	}
   async cancelLikeArticle() {}
   async articleStatus() {}
   async following() {
