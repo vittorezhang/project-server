@@ -148,7 +148,16 @@ class UserController extends BaseController {
       return this.message('取消点赞成功')
     }
   }
-  async articleStatus() {}
+  async articleStatus() {
+		const { ctx } = this
+    const me = await ctx.model.User.findById(ctx.state.userid)
+    console.log(me)
+    const like = !!me.likeArticle.find(id => id.toString() === ctx.params.id)
+    const dislike = !!me.disLikeArticle.find(id => id.toString() === ctx.params.id)
+    this.success({
+      like, dislike,
+    })
+	}
   async following() {
     const { ctx } = this
     const users = await ctx.model.User.findById(ctx.params.id).populate('following')
