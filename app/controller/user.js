@@ -67,7 +67,8 @@ class UserController extends BaseController {
     // this.success({ name: 'kkb' });
   }
   async checkEmail(email) {
-    
+    const user = await this.ctx.model.User.findOne({ email })
+    return user
   }
   async verify() {
     // 校验用户是否存在
