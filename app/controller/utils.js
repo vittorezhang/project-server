@@ -15,6 +15,14 @@ class UtilsController extends BaseController {
     this.ctx.response.type = 'image/svg+xml';
     this.ctx.body = captcha.data;
   }
+  async mergefile() {
+    const { ext, size, hash } = this.ctx.request.body
+    const filePath = path.resolve(this.config.UPLOAD_DIR, `${hash}.${ext}`)
+    await this.ctx.service.tools.mergeFile(filePath, hash, size)
+    this.success({
+      url: `/public/${hash}.${ext}`,
+    })
+  }
 	async sendcode() {
     const { ctx } = this
     const email = ctx.query.email
