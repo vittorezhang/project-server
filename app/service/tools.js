@@ -2,13 +2,13 @@ const { Service } = require('egg')
 const nodemailer = require('nodemailer')
 
 
-const userEmail = 'shengxinjing@126.com'
+const userEmail = 'yc_zwt@163.com'
 const transporter = nodemailer.createTransport({
-  service: '126',
+  service: '163',
   secureConnection: true,
   auth: {
     user: userEmail,
-    pass: 'a316783812',
+    pass: 'sss18211588737',
   },
 })
 
