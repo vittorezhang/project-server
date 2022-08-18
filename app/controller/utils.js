@@ -44,7 +44,8 @@ class UtilsController extends BaseController {
 	async uploadfile() {
     const { ctx } = this
     const file = ctx.request.files[0]
-    const { name } = ctx.request.body
+    const { hash, name } = ctx.request.body
+		const chunkPath = path.resolve(this.config.UPLOAD_DIR, hash)
 		console.log(name,file);
     await fse.move(file.filepath, this.config.UPLOAD_DIR + '/' + file.filename)
 		this.success({
