@@ -47,10 +47,17 @@ class UtilsController extends BaseController {
     const { hash, name } = ctx.request.body
 		const chunkPath = path.resolve(this.config.UPLOAD_DIR, hash)
 		console.log(name,file);
-    await fse.move(file.filepath, this.config.UPLOAD_DIR + '/' + file.filename)
+    // await fse.move(file.filepath, this.config.UPLOAD_DIR + '/' + file.filename)
 		this.success({
 			url:`/public/${file.filename}`
 		})
+		if (!fse.existsSync(chunkPath)) {
+      await fse.mkdir(chunkPath)
+    }
+
+    await fse.move(file.filepath, `${chunkPath}/${name}`)
+
+    this.message('切片上传成功')
   }
 }
 
