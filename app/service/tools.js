@@ -19,6 +19,25 @@ class ToolService extends Service {
     chunks.sort((a, b) => a.split('-')[1] - b.split('-')[1])
     chunks = chunks.map(cp => path.resolve(chunkdDir, cp))
   }
+	async mergeChunks(files, dest, size) {
+    const pipStream = (filePath, writeStream) => new Promise(resolve => {
+      const readStream = fse.createReadStream(filePath)
+      readStream.on('end', () => {
+        fse.unlinkSync(filePath)
+        resolve()
+      })
+      readStream.pipe(writeStream)
+    })
+
+    await Promise.all(
+      files.forEach((file, index) => {
+        pipStream(file, fse.createWriteStream(dest, {
+          start: index * size,
+          end: (index + 1) * size,
+        }))
+      })
+    )
+  }
   async sendMail(email, subject, text, html) {
     console.log(email, subject, html)
     const mailOptions = {
