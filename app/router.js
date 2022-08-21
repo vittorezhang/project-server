@@ -10,6 +10,8 @@ module.exports = app => {
   router.get('/captcha', controller.utils.captcha);
 	router.get('/sendcode', controller.utils.sendcode)
 	router.post('/uploadfile', controller.utils.uploadfile)
+  router.post('/mergefile', controller.utils.mergefile)
+  router.post('/checkfile', controller.utils.checkfile)
   router.group({ name: 'user', prefix: '/user' }, router => {
     const {
       info, register, login, verify, updateInfo, follow, followers, isfollow, cancelFollow, following, likeArticle, cancelLikeArticle, articleStatus
