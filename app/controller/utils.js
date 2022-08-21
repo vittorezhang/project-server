@@ -24,6 +24,24 @@ class UtilsController extends BaseController {
       url: `/public/${hash}.${ext}`,
     })
   }
+	async checkfile() {
+    const { ctx } = this
+    const { ext, hash } = ctx.request.body
+    const filePath = path.resolve(this.config.UPLOAD_DIR, `${hash}.${ext}`)
+
+    let uploaded = false
+    let uploadedList = []
+    if (fse.existsSync(filePath)) {
+      // 文件存在
+      uploaded = true
+    } else {
+      uploadedList = await this.getUploadedList(path.resolve(this.config.UPLOAD_DIR, hash))
+    }
+    this.success({
+      uploaded,
+      uploadedList,
+    })
+  }
 	async sendcode() {
     const { ctx } = this
     const email = ctx.query.email
