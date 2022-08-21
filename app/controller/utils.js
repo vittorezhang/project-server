@@ -42,6 +42,12 @@ class UtilsController extends BaseController {
       uploadedList,
     })
   }
+	// .DS_Strore
+  async getUploadedList(dirPath) {
+    return fse.existsSync(dirPath)
+      ? (await fse.readdir(dirPath)).filter(name => name[0] !== '.')
+      : []
+  }
 	async sendcode() {
     const { ctx } = this
     const email = ctx.query.email
