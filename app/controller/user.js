@@ -9,14 +9,19 @@ const createRule = {
   passwd: { type: 'string' },
   captcha: { type: 'string' },
 }
+
 class UserController extends BaseController {
 
   async login() {
-  //  this.success('token') 
-		const { ctx, app } = this
-    const { email, captcha, passwd } = ctx.request.body
+    // this.success('token')
+    const { ctx, app } = this
+    const { email, captcha, passwd, emailcode } = ctx.request.body
     if (captcha.toUpperCase() !== ctx.session.captcha.toUpperCase()) {
       return this.error('验证码错误')
+    }
+
+    if (emailcode !== ctx.session.emailcode) {
+      return this.error('邮箱验证码错误')
     }
 
     const user = await ctx.model.User.findOne({
@@ -31,21 +36,21 @@ class UserController extends BaseController {
       _id: user._id,
       email,
     }, app.config.jwt.secret, {
-      expiresIn: '1h',
+      expiresIn: '100h',
     })
     this.success({ token, email, nickname: user.nickname })
   }
   async register() {
-    const { ctx } = this;
+    const { ctx } = this
     try {
       // 校验传递的参数
-      ctx.validate(createRule);
+      ctx.validate(createRule)
     } catch (e) {
       // console.log(e)
-      return this.error('参数校验失败', -1, e.errors);
+      return this.error('参数校验失败', -1, e.errors)
     }
 
-    const { email, passwd, captcha, nickname } = ctx.request.body;
+    const { email, passwd, captcha, nickname } = ctx.request.body
 
     if (captcha.toUpperCase() !== ctx.session.captcha.toUpperCase()) {
       return this.error('验证码错误')
@@ -64,7 +69,7 @@ class UserController extends BaseController {
     }
 
 
-    // this.success({ name: 'kkb' });
+    // this.success({name:'kkb'})
   }
   async checkEmail(email) {
     const user = await this.ctx.model.User.findOne({ email })
@@ -79,6 +84,12 @@ class UserController extends BaseController {
     const user = await this.checkEmail(ctx.state.email)
     this.success(user)
   }
+  async info() {
+    const { ctx } = this
+    const { email } = ctx.state
+    const user = await this.checkEmail(email)
+    this.success(user)
+  }
   async updateInfo() {
     const { ctx } = this
     const url = ctx.request.body.url
@@ -89,12 +100,6 @@ class UserController extends BaseController {
     )
     this.success()
   }
-  async info() {
-    const { ctx } = this
-    const { email } = ctx.state
-    const user = await this.checkEmail(email)
-    this.success(user)
-  }
   async isfollow() {
     const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
@@ -102,8 +107,9 @@ class UserController extends BaseController {
     const isFollow = !!me.following.find(id => id.toString() === ctx.params.id)
     this.success({ isFollow })
   }
-	async follow() {
+  async follow() {
     const { ctx } = this
+
     const me = await ctx.model.User.findById(ctx.state.userid)
     const isFollow = !!me.following.find(id => id.toString() === ctx.params.id)
     if (!isFollow) {
@@ -112,12 +118,7 @@ class UserController extends BaseController {
       this.message('关注成功')
     }
   }
-  async followers() {
-    const { ctx } = this
-    const users = await ctx.model.User.find({ following: ctx.params.id })
-    this.success(users)
-  }
-	async cancelFollow() {
+  async cancelFollow() {
     const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
     // 把用户从我的following数组中删掉
@@ -127,9 +128,25 @@ class UserController extends BaseController {
       me.save()
       this.message('取消成功')
     }
+    // let isFollow = !!me.following.find(id=> id.toString()===ctx.params.id)
+    // if(!isFollow){
+    //   me.following.push(ctx.params.id)
+    //   me.save()
+    //   this.message('关注成功')
+    // }
   }
-  async likeArticle () {
-		const { ctx } = this
+  async following() {
+    const { ctx } = this
+    const users = await ctx.model.User.findById(ctx.params.id).populate('following')
+    this.success(users.following)
+  }
+  async followers() {
+    const { ctx } = this
+    const users = await ctx.model.User.find({ following: ctx.params.id })
+    this.success(users)
+  }
+  async likeArticle() {
+    const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
     if (!me.likeArticle.find(id => id.toString() === ctx.params.id)) {
       me.likeArticle.push(ctx.params.id)
@@ -137,8 +154,8 @@ class UserController extends BaseController {
       await ctx.model.Article.findByIdAndUpdate(ctx.params.id, { $inc: { like: 1 } })
       return this.message('点赞成功')
     }
-	}
-  async cancelLikeArticle () {
+  }
+  async cancelLikeArticle() {
     const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
     const index = me.likeArticle.map(id => id.toString()).indexOf(ctx.params.id)
@@ -150,7 +167,7 @@ class UserController extends BaseController {
     }
   }
   async articleStatus() {
-		const { ctx } = this
+    const { ctx } = this
     const me = await ctx.model.User.findById(ctx.state.userid)
     console.log(me)
     const like = !!me.likeArticle.find(id => id.toString() === ctx.params.id)
@@ -158,11 +175,6 @@ class UserController extends BaseController {
     this.success({
       like, dislike,
     })
-	}
-  async following() {
-    const { ctx } = this
-    const users = await ctx.model.User.findById(ctx.params.id).populate('following')
-    this.success(users.following)
   }
 }
 
