@@ -1,7 +1,8 @@
-'use strict';
-const svgCaptcha = require('svg-captcha');
+const svgCaptcha = require('svg-captcha')
 const fse = require('fs-extra')
+const path = require('path')
 const BaseController = require('./base')
+
 class UtilsController extends BaseController {
   async captcha() {
     const captcha = svgCaptcha.create({
@@ -24,7 +25,7 @@ class UtilsController extends BaseController {
       url: `/public/${hash}.${ext}`,
     })
   }
-	async checkfile() {
+  async checkfile() {
     const { ctx } = this
     const { ext, hash } = ctx.request.body
     const filePath = path.resolve(this.config.UPLOAD_DIR, `${hash}.${ext}`)
@@ -42,13 +43,43 @@ class UtilsController extends BaseController {
       uploadedList,
     })
   }
-	// .DS_Strore
+  // .DS_Strore
   async getUploadedList(dirPath) {
     return fse.existsSync(dirPath)
       ? (await fse.readdir(dirPath)).filter(name => name[0] !== '.')
       : []
   }
-	async sendcode() {
+  async uploadfile() {
+    // /public/hash/(hash+index)
+    // 报错
+    // if(Math.random()>0.3){
+    //   return this.ctx.status = 500
+    // }
+    const { ctx } = this
+    console.log(ctx.request)
+    const file = ctx.request.files[0]
+    const { hash, name } = ctx.request.body
+
+    const chunkPath = path.resolve(this.config.UPLOAD_DIR, hash)
+    // const filePath = path.resolve() // 文件最终存储的位置。合并之后
+
+    // console.log(name,file)
+
+    // console.log(file.filepath)
+    // console.log(this.config.UPLOAD_DIR)
+    if (!fse.existsSync(chunkPath)) {
+      await fse.mkdir(chunkPath)
+    }
+
+    await fse.move(file.filepath, `${chunkPath}/${name}`)
+
+    this.message('切片上传成功')
+    // this.success({
+    //   url:'xx'
+    // })
+  }
+  async sendcode() {
+		console.log('111');
     const { ctx } = this
     const email = ctx.query.email
     const code = Math.random().toString().slice(2, 6)
@@ -65,29 +96,6 @@ class UtilsController extends BaseController {
       this.error('发送失败')
     }
   }
-	async uploadfile() {
-		// /public/hash/(hash+index)
-    // 报错
-    if(Math.random()>0.3){
-      return this.ctx.status = 500
-    }
-    const { ctx } = this
-    const file = ctx.request.files[0]
-    const { hash, name } = ctx.request.body
-		const chunkPath = path.resolve(this.config.UPLOAD_DIR, hash)
-		console.log(name,file);
-    // await fse.move(file.filepath, this.config.UPLOAD_DIR + '/' + file.filename)
-		this.success({
-			url:`/public/${file.filename}`
-		})
-		if (!fse.existsSync(chunkPath)) {
-      await fse.mkdir(chunkPath)
-    }
 
-    await fse.move(file.filepath, `${chunkPath}/${name}`)
-
-    this.message('切片上传成功')
-  }
 }
-
 module.exports = UtilsController;
