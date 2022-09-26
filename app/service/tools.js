@@ -14,14 +14,17 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+
 class ToolService extends Service {
-	async mergeFile(filepPath, filehash, size) {
+  async mergeFile(filepPath, filehash, size) {
     const chunkdDir = path.resolve(this.config.UPLOAD_DIR, filehash) // 切片的文件夹
     let chunks = await fse.readdir(chunkdDir)
     chunks.sort((a, b) => a.split('-')[1] - b.split('-')[1])
     chunks = chunks.map(cp => path.resolve(chunkdDir, cp))
+    await this.mergeChunks(chunks, filepPath, size)
+
   }
-	async mergeChunks(files, dest, size) {
+  async mergeChunks(files, dest, size) {
     const pipStream = (filePath, writeStream) => new Promise(resolve => {
       const readStream = fse.createReadStream(filePath)
       readStream.on('end', () => {
