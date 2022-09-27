@@ -1,34 +1,67 @@
-'use strict';
+'use strict'
 
 /**
  * @param {Egg.Application} app - egg application
  */
 module.exports = app => {
-  const { router, controller } = app;
-  router.get('/', controller.home.index);
+  const { router, controller } = app
+  const jwt = app.middleware.jwt({ app })
+  router.get('/', controller.home.index)
+
   // 验证码
-  router.get('/captcha', controller.utils.captcha);
-	router.get('/sendcode', controller.utils.sendcode)
-	router.post('/uploadfile', controller.utils.uploadfile)
+  router.get('/captcha', controller.utils.captcha)
+  router.get('/sendcode', controller.utils.sendcode)
+  router.post('/uploadfile', controller.utils.uploadfile)
   router.post('/mergefile', controller.utils.mergefile)
   router.post('/checkfile', controller.utils.checkfile)
+
+
   router.group({ name: 'user', prefix: '/user' }, router => {
+
     const {
-      info, register, login, verify, updateInfo, follow, followers, isfollow, cancelFollow, following, likeArticle, cancelLikeArticle, articleStatus
-    } = controller.user;
-    router.post('/register', register);
-    router.post('/login', login);
-    router.get('/info', info);
-    router.put('/info', updateInfo)
-    router.get('/verify', verify);
-		router.get('/detail', info);
-    router.put('/follow/:id', follow);
+      info, register, login, verify, updateInfo,
+      isfollow,
+      follow, cancelFollow,
+      following, followers,
+      articleStatus,
+      likeArticle, cancelLikeArticle,
+
+    } = controller.user
+
+    router.post('/register', register)
+    router.post('/login', login)
+
+    router.get('/info', jwt, info)
+    router.put('/info', jwt, updateInfo)
+    router.get('/detail', jwt, info)
+
+    router.get('/verify', verify)
+
+
+    router.get('/follow/:id', jwt, isfollow)
+
+    router.put('/follow/:id', jwt, follow)
+    router.delete('/follow/:id', jwt, cancelFollow)
+
+    router.get('/:id/following', following)
     router.get('/:id/followers', followers)
-    router.get('/follow/:id', isfollow);
-		router.delete('/follow/:id', cancelFollow);
-		router.put('/likeArticle/:id', likeArticle);
-    router.get('/:id/following', following);
-    router.delete('/likeArticle/:id', cancelLikeArticle);
-		router.get('/article/:id', articleStatus);
-  });
-};
+
+    router.get('/article/:id', jwt, articleStatus)
+
+    // // .put点赞，。delete取消点赞
+    router.put('/likeArticle/:id', jwt, likeArticle)
+    router.delete('/likeArticle/:id', jwt, cancelLikeArticle)
+
+  })
+
+  router.group({ name: 'article', prefix: '/article' }, router => {
+    const { create, detail, index } = controller.article
+    router.post('/create', jwt, create)
+    router.get('/:id', detail)
+    router.get('/', index)
+  })
+
+  // /user/register
+  // /user/loigin
+  // /user/follow
+}
